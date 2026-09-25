@@ -8,3 +8,4 @@ quantity = 5
 total = calculate_total(price, quantity)
 
 print("Total:", total)
+# Testing AI code review workflow
