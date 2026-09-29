@@ -1,0 +1,19 @@
+import pyspark.sql.functions as F
+
+# 1. Load large scale 1-Million orders and 500 sellers datasets
+df_orders = spark.read.csv("dbfs:/mnt/data/orders.csv", header=True, inferSchema=True)
+df_customers = spark.read.csv("dbfs:/mnt/data/customers.csv", header=True, inferSchema=True)
+
+# 2. Heavy Transformation in a loop (THE BUGGY PART)
+# Target: Filter high value cancellations across multiple explicit status states
+status_flags = ["CANCELLED", "PENDING_CANCELLATION", "REFUNDED"]
+
+for status in status_flags:
+    # ⚠️ CRITICAL BUG: Creating a massive unoptimized lineage in a loop
+    df_orders = df_orders.filter(df_orders.ORDER_STATUS == status).withColumn("AUDIT_TIMESTAMP", F.current_timestamp())
+
+# 3. Joining two large distributed dataframes without optimization
+df_final = df_orders.join(df_customers, on="CUSTOMER_ID", how="inner")
+
+# 4. Action that triggers out-of-memory (OOM) error
+df_final.show()
