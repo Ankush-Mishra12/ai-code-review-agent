@@ -1,0 +1,9 @@
+def check_delivery_risk(real_days, scheduled_days)
+    if real_days > scheduled_days:
+        status = "🚨 Late Delivery"
+    elif real_days == scheduled_days:
+        status = "✅ Shipping on Time"
+    else:
+        status = "⚡ Advance Shipping"
+        
+    return Status
